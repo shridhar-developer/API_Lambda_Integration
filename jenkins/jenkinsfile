@@ -1,0 +1,29 @@
+pipeline {
+    agent {
+        node{
+           docker { image 'node:7-alpine' } 
+        }
+    }
+    stages {
+	    Variables {
+		    S3_BUCKET: aws-lambda-authorizer
+        }
+        stage('Dev') {
+            steps {
+              script{
+                    apt-get update
+                    apt-get -y install zip
+                    cd lambda-authorizer
+                    zip -r source.zip *
+                 }
+				 
+              pip3 install awscli
+              aws s3 cp lambda-authorizer/source.zip s3://$S3_BUCKET/
+              aws s3 cp lambda-authorizer/template.yaml s3://$S3_BUCKET/
+              aws cloudformation deploy --template-file template.yaml --stack-name aws-lambda-authorizer --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+              aws lambda update-function-code --function-name lambda_handler --s3-bucket $S3_BUCKET --s3-key source.zip
+                
+            }
+        }
+    }
+}
