@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+
+  HttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+      StageName: $default
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Events:
+        Get:
+          Type: HttpApi
+          Properties:
+            Path: /
+            Method: GET
+            ApiId: !Ref HttpApi
+      CodeUri: lambda_authorizer_basic_auth/
+      Handler: app.lambda_handler
+      Policies:
+      Runtime: python3.7
+
+
+Outputs:
+  ApiUrl:
+    Description: HTTP API invoke URL
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com"
