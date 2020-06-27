@@ -1,5 +1,5 @@
 """
-Simple authorization lambda
+Simple lambda
 """
 from __future__ import print_function
 
