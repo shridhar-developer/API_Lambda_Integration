@@ -1,12 +1,13 @@
 import json
 import pytest
 import app
-
+import requests
 
 @pytest.fixture()
-def apigw_auth_event():
-    { "key1": "value1", "key2": "value2", "key3": "value3"}
 
 def test_lambda_handler(apigw_auth_event):
-    ret = app.lambda_handler(apigw_auth_event, "")
-    assert ret == 'Hello World'
+    print("starting the test. Calling the API link")
+    x = requests.get('https://1wwj0frdba.execute-api.us-east-1.amazonaws.com/')
+    print('done calling recieved: ' + x.text)
+    #ret = app.lambda_handler(apigw_auth_event, "")
+    assert ret ==  x.text
