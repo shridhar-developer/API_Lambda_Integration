@@ -11,42 +11,8 @@ import base64
 import boto3
 
 def lambda_handler(event, context):
+	return"Hello World"
 
-    # Ensure the incoming Lambda event is for a request authorizer
-    if event['type'] != 'REQUEST':
-        raise Exception('Unauthorized')
-
-    try:
-        
-        principalId = event['requestContext']['accountId']
-
-        tmp = event['methodArn'].split(':')
-        apiGatewayArnTmp = tmp[5].split('/')
-        awsAccountId = tmp[4]
-
-        policy = AuthPolicy(principalId, awsAccountId)
-        policy.restApiId = apiGatewayArnTmp[0]
-        policy.region = tmp[3]
-        policy.stage = apiGatewayArnTmp[1]
-
-        # Get authorization header in lowercase
-        authorization_header = {k.lower(): v for k, v in event['headers'].items() if k.lower() == 'authorization'}
-
-
-        # Get the username:password hash from the authorization header
-        username_password_hash = authorization_header['authorization'].split()[1]
-
-        # Decode username_password_hash and get username
-        username = base64.standard_b64decode(username_password_hash).split(':')[0]
-
-        policy.allowMethod(event['requestContext']['httpMethod'], event['path'])
-
-        # Finally, build the policy
-        authResponse = policy.build()
-
-        return authResponse
-    except Exception:
-        raise Exception('Unauthorized')
 
 
 class HttpVerb:
